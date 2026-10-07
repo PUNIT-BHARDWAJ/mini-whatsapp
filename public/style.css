@@ -1,0 +1,286 @@
+/* Mini WhatsApp — chat CRUD on Express + MongoDB. */
+
+:root {
+  --wa-teal: #075e54;
+  --wa-green: #25d366;
+  --wa-bubble: #d9fdd3;
+  --wa-wall: #efeae2;
+  --wa-ink: #111b21;
+  --wa-muted: #667781;
+  --wa-card: #ffffff;
+  --wa-danger: #c0392b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Nunito Sans", system-ui, sans-serif;
+  color: var(--wa-ink);
+  background-color: var(--wa-wall);
+  /* Soft dotted wallpaper, like a chat background. */
+  background-image:
+    radial-gradient(rgba(7, 94, 84, 0.08) 1.2px, transparent 1.2px),
+    radial-gradient(rgba(7, 94, 84, 0.05) 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+  background-position: 0 0, 14px 14px;
+  min-height: 100vh;
+}
+
+/* ---------- Top bar ---------- */
+.wa-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.5rem;
+  background: var(--wa-teal);
+  color: #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+}
+
+.wa-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+
+.wa-brand svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+/* ---------- Buttons ---------- */
+.wa-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.6rem 1.1rem;
+  background: var(--wa-green);
+  color: #06261f;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.wa-btn:hover {
+  filter: brightness(0.95);
+}
+
+.wa-btn-full {
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.8rem;
+}
+
+/* ---------- Layout ---------- */
+.wa-main {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 4rem;
+}
+
+.wa-narrow {
+  max-width: 30rem;
+}
+
+.wa-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 1.25rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.wa-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.8rem;
+  height: 1.8rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  background: var(--wa-green);
+  color: #06261f;
+  font-size: 0.85rem;
+}
+
+/* ---------- Chat list ---------- */
+.wa-list {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.wa-chat {
+  display: flex;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
+  background: var(--wa-card);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(11, 20, 26, 0.12);
+}
+
+.wa-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #128c7e, #25d366);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.wa-chat-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.wa-chat-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  font-size: 0.95rem;
+  text-transform: capitalize;
+}
+
+.wa-arrow {
+  color: var(--wa-muted);
+}
+
+.wa-chat-head time {
+  color: var(--wa-muted);
+  font-size: 0.8rem;
+  text-transform: none;
+}
+
+.wa-bubble {
+  position: relative;
+  display: inline-block;
+  margin: 0.55rem 0 0.75rem;
+  padding: 0.55rem 0.85rem;
+  max-width: 100%;
+  background: var(--wa-bubble);
+  border-radius: 0 10px 10px 10px;
+  overflow-wrap: anywhere;
+}
+
+/* Bubble tail */
+.wa-bubble::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -7px;
+  border-top: 8px solid var(--wa-bubble);
+  border-left: 8px solid transparent;
+}
+
+.wa-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.wa-actions form {
+  margin: 0;
+}
+
+.wa-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid #d1d7db;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--wa-ink);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.wa-chip:hover {
+  background: #f0f2f5;
+}
+
+.wa-chip-danger {
+  color: var(--wa-danger);
+  border-color: #f1c4bf;
+}
+
+.wa-empty {
+  color: var(--wa-muted);
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* ---------- Forms ---------- */
+.wa-card {
+  padding: 1.5rem;
+  background: var(--wa-card);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(11, 20, 26, 0.15);
+}
+
+.wa-meta {
+  margin: -0.5rem 0 1rem;
+  color: var(--wa-muted);
+  text-transform: capitalize;
+}
+
+.wa-label {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem 0 0.35rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.wa-counter {
+  color: var(--wa-muted);
+  font-weight: 600;
+}
+
+.wa-input {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid #d1d7db;
+  border-radius: 10px;
+  font: inherit;
+  color: inherit;
+  background: #fff;
+  resize: vertical;
+}
+
+.wa-input:focus {
+  outline: none;
+  border-color: var(--wa-teal);
+  box-shadow: 0 0 0 3px rgba(7, 94, 84, 0.15);
+}
+
+@media (max-width: 480px) {
+  .wa-bar {
+    padding: 0.8rem 1rem;
+  }
+
+  .wa-chat {
+    padding: 0.9rem;
+  }
+}
